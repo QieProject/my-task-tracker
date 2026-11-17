@@ -19,5 +19,11 @@ My first project!
 
 - Added user validation 
 
+## Version 1.2.0 (17/11/26)
+
+- Added reminder 
+- Added notification system (on working)
+
+
 ## Link
 (https://qieproject.github.io/my-calendar/)

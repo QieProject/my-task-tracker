@@ -5,6 +5,8 @@ let taskSubmitDate = document.getElementById("taskSubmitDate");
 let taskDecs = document.getElementById("taskDecs");
 let addBtn = document.getElementById("addBtn");
 let taskList = document.getElementById("taskList");
+let notifyBtn = document.getElementById("notifyBtn");
+let reminderBox = document.getElementById("reminderBox");
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -71,6 +73,103 @@ function showTasks() {
 
     taskList.appendChild(row);
   }
+
+  showReminder();
+}
+
+function notifyUser() {
+  if (!("Notification" in window)) {
+    return;
+  }
+  if (Notification.permission !== "granted") {
+    return;
+  }
+
+  let today = new Date().toLocaleDateString("en-CA");
+  let overdue = 0;
+  let dueToday = 0;
+  let dueSoon = 0;
+
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].done !== true) {
+      let diff = (new Date(tasks[i].date) - new Date(today)) / (1000 * 60 * 60 * 24);
+
+      if (diff < 0) {
+        overdue++;
+      } else if (diff === 0) {
+        dueToday++;
+      } else if (diff <= 3) {
+        dueSoon++;
+      }
+    }
+  }
+
+  if (overdue + dueToday + dueSoon === 0) {
+    return;
+  }
+
+  let message = overdue + " overdue, " + dueToday + " due today, " + dueSoon + " due soon";
+
+  navigator.serviceWorker.ready.then(function (reg) {
+    reg.showNotification("My Task Tracker", { body: message });
+  });
+}
+
+notifyBtn.onclick = function () {
+  Notification.requestPermission().then(function (result) {
+    if (result === "granted") {
+      alert("Notification enabled");
+      notifyUser();
+    } else {
+      alert("Notification not allowed");
+    }
+  });
+};
+
+function addGroup(heading, list) {
+  if (list.length === 0) {
+    return;
+  }
+
+  let h = document.createElement("p");
+  h.textContent = heading;
+  h.style.fontWeight = "bold";
+  reminderBox.appendChild(h);
+
+  for (let i = 0; i < list.length; i++) {
+    let line = document.createElement("p");
+    line.textContent = "- " + list[i];
+    reminderBox.appendChild(line);
+  }
+}
+
+function showReminder() {
+  reminderBox.innerHTML = "";
+
+  let today = new Date().toLocaleDateString("en-CA");
+
+  let overdueList = [];
+  let todayList = [];
+  let soonList = [];
+
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].done !== true) {
+      let diff = (new Date(tasks[i].date) - new Date(today)) / (1000 * 60 * 60 * 24);
+      let text = tasks[i].title + " (" + tasks[i].subject + ")";
+
+      if (diff < 0) {
+        overdueList.push(text);
+      } else if (diff === 0) {
+        todayList.push(text);
+      } else if (diff <= 3) {
+        soonList.push(text + " - " + diff + " day(s) left");
+      }
+    }
+  }
+
+  addGroup("OVERDUE:", overdueList);
+  addGroup("DUE TODAY:", todayList);
+  addGroup("DUE SOON:", soonList);
 }
 
 addBtn.onclick = function () {
@@ -107,3 +206,4 @@ addBtn.onclick = function () {
 };
 
 showTasks();
+notifyUser();
