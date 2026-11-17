@@ -1,4 +1,4 @@
-# my-calendar
+# my-task-tracker
 
 My first project!
 
@@ -24,6 +24,10 @@ My first project!
 - Added reminder 
 - Added notification system (on working)
 
+## Version 1.2.1 (17/11/26)
+
+- Update README file
+
 
 ## Link
-(https://qieproject.github.io/my-calendar/)
+(https://qieproject.github.io/my-task-tracker/)
