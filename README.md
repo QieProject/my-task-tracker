@@ -28,6 +28,5 @@ My first project!
 
 - Update README file
 
-
 ## Link
 (https://qieproject.github.io/my-task-tracker/)
