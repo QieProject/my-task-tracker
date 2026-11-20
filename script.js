@@ -30,6 +30,33 @@ function clearForm() {
   addBtn.textContent = "Add New";
 }
 
+function addToCalendar(task) {
+  let startDate = task.date;
+
+  if (task.dateAdded) {
+    let dayAfterAdded = new Date(task.dateAdded);
+    dayAfterAdded.setUTCDate(dayAfterAdded.getUTCDate() + 1);
+    startDate = dayAfterAdded.toISOString().slice(0, 10);
+
+    if (startDate > task.date) {
+      startDate = task.date;
+    }
+  }
+
+  let start = startDate.split("-").join("");
+
+  let nextDay = new Date(task.date);
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+  let end = nextDay.toISOString().slice(0, 10).split("-").join("");
+
+  let url = "https://calendar.google.com/calendar/render?action=TEMPLATE";
+  url += "&text=" + encodeURIComponent(task.title + " (" + task.subject + ")");
+  url += "&dates=" + start + "/" + end;
+  url += "&details=" + encodeURIComponent(task.category + " - " + task.description);
+
+  window.open(url, "_blank");
+}
+
 function showTasks() {
   tasks.sort(function (a, b) {
     if (a.date < b.date) return -1;
@@ -90,9 +117,16 @@ function showTasks() {
       showTasks();
     };
 
+    let calBtn = document.createElement("button");
+    calBtn.textContent = "Add to Calendar";
+    calBtn.onclick = function () {
+      addToCalendar(tasks[i]);
+    };
+
     actionCell.appendChild(doneBtn);
     actionCell.appendChild(editBtn);
     actionCell.appendChild(deleteBtn);
+    actionCell.appendChild(calBtn);
     row.appendChild(actionCell);
 
     taskList.appendChild(row);
@@ -233,9 +267,5 @@ addBtn.onclick = function () {
   clearForm();
 };
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-
 showTasks();
-notifyUser();
+//notifyUser();

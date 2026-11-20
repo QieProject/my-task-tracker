@@ -32,5 +32,9 @@ My first project!
 
 - Added edit task function
 
+## Version 1.4.0 (20/11/26)
+
+- Added add to calendar function
+
 ## Link
 (https://qieproject.github.io/my-task-tracker/)
