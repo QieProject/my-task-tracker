@@ -36,9 +36,13 @@ My first project!
 
 - Added add to calendar function
 
-## Version 1.4.0 (20/11/26)
+## Version 1.5.0 (20/11/26)
 
 - Added function to sort event automatically to calendar
+
+## Version 1.5.1 (20/11/26)
+
+- Set start date same as due date on calendar
 
 ## Link
 (https://qieproject.github.io/my-task-tracker/)

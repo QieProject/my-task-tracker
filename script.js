@@ -41,19 +41,7 @@ let calendarIds = {
 };
 
 function addToCalendar(task) {
-  let startDate = task.date;
-
-  if (task.dateAdded) {
-    let dayAfterAdded = new Date(task.dateAdded);
-    dayAfterAdded.setUTCDate(dayAfterAdded.getUTCDate() + 1);
-    startDate = dayAfterAdded.toISOString().slice(0, 10);
-
-    if (startDate > task.date) {
-      startDate = task.date;
-    }
-  }
-
-  let start = startDate.split("-").join("");
+  let start = task.date.split("-").join("");
 
   let nextDay = new Date(task.date);
   nextDay.setUTCDate(nextDay.getUTCDate() + 1);
