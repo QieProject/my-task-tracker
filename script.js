@@ -19,6 +19,7 @@ function addCell(row, text) {
   let cell = document.createElement("td");
   cell.textContent = text;
   row.appendChild(cell);
+  return cell;
 }
 
 function clearForm() {
@@ -29,6 +30,15 @@ function clearForm() {
   editingIndex = -1;
   addBtn.textContent = "Add New";
 }
+
+let calendarIds = {
+  "Assignment": "dc62c72892dc3caac2113d0004b8a6ea589145d2e77803b6cab99c5ae90324c4@group.calendar.google.com",
+  "Meeting": "399b942bced56b09583aeaf16206df69cc098698819af951730c04f0adf435fb@group.calendar.google.com",
+  "Presentation": "989434a62e24a3539ad6bcf463808534854964a3bab48d3821add073067b0173@group.calendar.google.com",
+  "Quiz": "3d2f384b54c3bf70e288714fb8882b8accb2e4b84f97049cdced836333885f61@group.calendar.google.com",
+  "Test": "b06c0edb1200baa11512a6b41e26ee5f2a43666b6579945e09801f374429e0f8@group.calendar.google.com",
+  "Other": ""
+};
 
 function addToCalendar(task) {
   let startDate = task.date;
@@ -53,6 +63,11 @@ function addToCalendar(task) {
   url += "&text=" + encodeURIComponent(task.title + " (" + task.subject + ")");
   url += "&dates=" + start + "/" + end;
   url += "&details=" + encodeURIComponent(task.category + " - " + task.description);
+
+  let calId = calendarIds[task.category];
+  if (calId) {
+    url += "&src=" + encodeURIComponent(calId);
+  }
 
   window.open(url, "_blank");
 }
