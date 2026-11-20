@@ -1,2 +1,1 @@
-self.addEventListener("install", function () {});
-
+//self.addEventListener("install", function () {});

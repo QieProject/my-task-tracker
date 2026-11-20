@@ -28,5 +28,9 @@ My first project!
 
 - Update README file
 
+## Version 1.3.0 (20/11/26)
+
+- Added edit task function
+
 ## Link
 (https://qieproject.github.io/my-task-tracker/)

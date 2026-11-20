@@ -7,6 +7,7 @@ let addBtn = document.getElementById("addBtn");
 let taskList = document.getElementById("taskList");
 let notifyBtn = document.getElementById("notifyBtn");
 let reminderBox = document.getElementById("reminderBox");
+let editingIndex = -1;
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -18,6 +19,15 @@ function addCell(row, text) {
   let cell = document.createElement("td");
   cell.textContent = text;
   row.appendChild(cell);
+}
+
+function clearForm() {
+  taskSubject.value = "";
+  taskTitle.value = "";
+  taskSubmitDate.value = "";
+  taskDecs.value = "";
+  editingIndex = -1;
+  addBtn.textContent = "Add New";
 }
 
 function showTasks() {
@@ -59,15 +69,29 @@ function showTasks() {
       showTasks();
     };
 
+    let editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+    editBtn.onclick = function () {
+      taskSubject.value = tasks[i].subject;
+      taskTitle.value = tasks[i].title;
+      taskCategory.value = tasks[i].category;
+      taskSubmitDate.value = tasks[i].date;
+      taskDecs.value = tasks[i].description;
+      editingIndex = i;
+      addBtn.textContent = "Save Changes";
+    };
+
     let deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Delete";
     deleteBtn.onclick = function () {
       tasks.splice(i, 1);
+      clearForm();
       saveTasks();
       showTasks();
     };
 
     actionCell.appendChild(doneBtn);
+    actionCell.appendChild(editBtn);
     actionCell.appendChild(deleteBtn);
     row.appendChild(actionCell);
 
@@ -77,7 +101,7 @@ function showTasks() {
   showReminder();
 }
 
-function notifyUser() {
+/*function notifyUser() {
   if (!("Notification" in window)) {
     return;
   }
@@ -124,7 +148,7 @@ notifyBtn.onclick = function () {
       alert("Notification not allowed");
     }
   });
-};
+};*/
 
 function addGroup(heading, list) {
   if (list.length === 0) {
@@ -184,26 +208,34 @@ addBtn.onclick = function () {
     return;
   }
 
-  let dateAdded = new Date().toLocaleDateString("en-CA");
+  if (editingIndex === -1) {
+    let dateAdded = new Date().toLocaleDateString("en-CA");
 
-  tasks.push({
-    subject: subject,
-    title: title,
-    category: category,
-    date: taskDate,
-    description: description,
-    dateAdded: dateAdded,
-    done: false
-  });
+    tasks.push({
+      subject: subject,
+      title: title,
+      category: category,
+      date: taskDate,
+      description: description,
+      dateAdded: dateAdded,
+      done: false
+    });
+  } else {
+    tasks[editingIndex].subject = subject;
+    tasks[editingIndex].title = title;
+    tasks[editingIndex].category = category;
+    tasks[editingIndex].date = taskDate;
+    tasks[editingIndex].description = description;
+  }
 
   saveTasks();
   showTasks();
-
-  taskSubject.value = "";
-  taskTitle.value = "";
-  taskSubmitDate.value = "";
-  taskDecs.value = "";
+  clearForm();
 };
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 
 showTasks();
 notifyUser();
