@@ -66,11 +66,28 @@ button.secondary:hover {
   background-color: #4b5563;
 }
 
-#openFormBtn {
-  display: block;
-  margin: 12px auto;
+.top-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.top-buttons button {
   padding: 10px 18px;
   font-size: 15px;
+}
+
+.note {
+  font-size: 14px;
+  color: #b3b3b3;
+  line-height: 1.5;
+}
+
+ol.note,
+ul.note {
+  padding-left: 20px;
 }
 
 #reminderBox {
@@ -164,6 +181,11 @@ td:last-child {
   white-space: nowrap;
 }
 
+.empty-msg {
+  color: #9ca3af;
+  padding: 24px;
+}
+
 .pill {
   display: inline-block;
   padding: 4px 10px;
@@ -247,4 +269,4 @@ td:last-child {
   max-width: 420px;
   max-height: 90vh;
   overflow-y: auto;
-} 
+}

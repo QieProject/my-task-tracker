@@ -10,9 +10,25 @@ let modal = document.getElementById("modal");
 let modalTitle = document.getElementById("modalTitle");
 let taskList = document.getElementById("taskList");
 let reminderBox = document.getElementById("reminderBox");
+
+let settingsBtn = document.getElementById("settingsBtn");
+let settingsModal = document.getElementById("settingsModal");
+let saveSettingsBtn = document.getElementById("saveSettingsBtn");
+let cancelSettingsBtn = document.getElementById("cancelSettingsBtn");
+let idAssignment = document.getElementById("idAssignment");
+let idMeeting = document.getElementById("idMeeting");
+let idPresentation = document.getElementById("idPresentation");
+let idQuiz = document.getElementById("idQuiz");
+let idTest = document.getElementById("idTest");
+
+let helpBtn = document.getElementById("helpBtn");
+let helpModal = document.getElementById("helpModal");
+let closeHelpBtn = document.getElementById("closeHelpBtn");
+
 let editingIndex = -1;
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let calendarIds = JSON.parse(localStorage.getItem("calendarIds")) || {};
 
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -45,14 +61,26 @@ function closeForm() {
   clearForm();
 }
 
-let calendarIds = {
-  "Assignment": "dc62c72892dc3caac2113d0004b8a6ea589145d2e77803b6cab99c5ae90324c4@group.calendar.google.com",
-  "Meeting": "399b942bced56b09583aeaf16206df69cc098698819af951730c04f0adf435fb@group.calendar.google.com",
-  "Presentation": "989434a62e24a3539ad6bcf463808534854964a3bab48d3821add073067b0173@group.calendar.google.com",
-  "Quiz": "3d2f384b54c3bf70e288714fb8882b8accb2e4b84f97049cdced836333885f61@group.calendar.google.com",
-  "Test": "b06c0edb1200baa11512a6b41e26ee5f2a43666b6579945e09801f374429e0f8@group.calendar.google.com",
-  "Other": ""
-};
+function openSettings() {
+  idAssignment.value = calendarIds["Assignment"] || "";
+  idMeeting.value = calendarIds["Meeting"] || "";
+  idPresentation.value = calendarIds["Presentation"] || "";
+  idQuiz.value = calendarIds["Quiz"] || "";
+  idTest.value = calendarIds["Test"] || "";
+  settingsModal.style.display = "flex";
+}
+
+function closeSettings() {
+  settingsModal.style.display = "none";
+}
+
+function openHelp() {
+  helpModal.style.display = "flex";
+}
+
+function closeHelp() {
+  helpModal.style.display = "none";
+}
 
 function addToCalendar(task) {
   let start = task.date.split("-").join("");
@@ -83,6 +111,16 @@ function showTasks() {
 
   taskList.innerHTML = "";
 
+  if (tasks.length === 0) {
+    let emptyRow = document.createElement("tr");
+    let emptyCell = document.createElement("td");
+    emptyCell.colSpan = 8;
+    emptyCell.className = "empty-msg";
+    emptyCell.textContent = "No tasks yet. Tap Add New Task to start.";
+    emptyRow.appendChild(emptyCell);
+    taskList.appendChild(emptyRow);
+  }
+
   for (let i = 0; i < tasks.length; i++) {
     let row = document.createElement("tr");
 
@@ -100,7 +138,7 @@ function showTasks() {
       pill.className = "pill pill-pending";
     }
     statusCell.appendChild(pill);
-      
+
     addCell(row, tasks[i].date);
     addCell(row, tasks[i].subject);
     addCell(row, tasks[i].title);
@@ -232,6 +270,48 @@ modal.onclick = function (event) {
   }
 };
 
+settingsBtn.onclick = function () {
+  openSettings();
+};
+
+cancelSettingsBtn.onclick = function () {
+  closeSettings();
+};
+
+settingsModal.onclick = function (event) {
+  if (event.target === settingsModal) {
+    closeSettings();
+  }
+};
+
+helpBtn.onclick = function () {
+  openHelp();
+};
+
+closeHelpBtn.onclick = function () {
+  closeHelp();
+};
+
+helpModal.onclick = function (event) {
+  if (event.target === helpModal) {
+    closeHelp();
+  }
+};
+
+saveSettingsBtn.onclick = function () {
+  calendarIds = {
+    "Assignment": idAssignment.value.trim(),
+    "Meeting": idMeeting.value.trim(),
+    "Presentation": idPresentation.value.trim(),
+    "Quiz": idQuiz.value.trim(),
+    "Test": idTest.value.trim()
+  };
+
+  localStorage.setItem("calendarIds", JSON.stringify(calendarIds));
+  closeSettings();
+  alert("Settings saved");
+};
+
 addBtn.onclick = function () {
   let subject = taskSubject.value;
   let title = taskTitle.value;
@@ -269,4 +349,4 @@ addBtn.onclick = function () {
   closeForm();
 };
 
-showTasks();
+showTasks();  
