@@ -44,5 +44,13 @@ My first project!
 
 - Set start date same as due date on calendar
 
+## Version 1.6.0 (21/11/26)
+
+- Single-page layout with popup form for adding and editing tasks
+- Dark theme
+- Coloured reminder cards (overdue, due today, due soon)
+- Coloured action buttons and status labels
+- Add to Calendar opens a pre-filled event in a calendar per category
+
 ## Link
 (https://qieproject.github.io/my-task-tracker/)

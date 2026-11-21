@@ -4,8 +4,11 @@ let taskCategory = document.getElementById("taskCategory");
 let taskSubmitDate = document.getElementById("taskSubmitDate");
 let taskDecs = document.getElementById("taskDecs");
 let addBtn = document.getElementById("addBtn");
+let cancelBtn = document.getElementById("cancelBtn");
+let openFormBtn = document.getElementById("openFormBtn");
+let modal = document.getElementById("modal");
+let modalTitle = document.getElementById("modalTitle");
 let taskList = document.getElementById("taskList");
-let notifyBtn = document.getElementById("notifyBtn");
 let reminderBox = document.getElementById("reminderBox");
 let editingIndex = -1;
 
@@ -22,13 +25,24 @@ function addCell(row, text) {
   return cell;
 }
 
+function openForm() {
+  modal.style.display = "flex";
+}
+
 function clearForm() {
   taskSubject.value = "";
   taskTitle.value = "";
+  taskCategory.selectedIndex = 0;
   taskSubmitDate.value = "";
   taskDecs.value = "";
   editingIndex = -1;
   addBtn.textContent = "Add New";
+  modalTitle.textContent = "Add New Task";
+}
+
+function closeForm() {
+  modal.style.display = "none";
+  clearForm();
 }
 
 let calendarIds = {
@@ -77,7 +91,16 @@ function showTasks() {
       status = "Done";
     }
 
-    addCell(row, status);
+    let statusCell = addCell(row, "");
+    let pill = document.createElement("span");
+    pill.textContent = status;
+    if (tasks[i].done === true) {
+      pill.className = "pill pill-done";
+    } else {
+      pill.className = "pill pill-pending";
+    }
+    statusCell.appendChild(pill);
+      
     addCell(row, tasks[i].date);
     addCell(row, tasks[i].subject);
     addCell(row, tasks[i].title);
@@ -90,8 +113,10 @@ function showTasks() {
     let doneBtn = document.createElement("button");
     if (tasks[i].done === true) {
       doneBtn.textContent = "Undo";
+      doneBtn.className = "btn-undo";
     } else {
       doneBtn.textContent = "Finish";
+      doneBtn.className = "btn-finish";
     }
     doneBtn.onclick = function () {
       tasks[i].done = !tasks[i].done;
@@ -101,6 +126,7 @@ function showTasks() {
 
     let editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
+    editBtn.className = "btn-edit";
     editBtn.onclick = function () {
       taskSubject.value = tasks[i].subject;
       taskTitle.value = tasks[i].title;
@@ -109,19 +135,22 @@ function showTasks() {
       taskDecs.value = tasks[i].description;
       editingIndex = i;
       addBtn.textContent = "Save Changes";
+      modalTitle.textContent = "Edit Task";
+      openForm();
     };
 
     let deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Delete";
+    deleteBtn.className = "btn-delete";
     deleteBtn.onclick = function () {
       tasks.splice(i, 1);
-      clearForm();
       saveTasks();
       showTasks();
     };
 
     let calBtn = document.createElement("button");
     calBtn.textContent = "Add to Calendar";
+    calBtn.className = "btn-calendar";
     calBtn.onclick = function () {
       addToCalendar(tasks[i]);
     };
@@ -138,70 +167,25 @@ function showTasks() {
   showReminder();
 }
 
-/*function notifyUser() {
-  if (!("Notification" in window)) {
-    return;
-  }
-  if (Notification.permission !== "granted") {
-    return;
-  }
-
-  let today = new Date().toLocaleDateString("en-CA");
-  let overdue = 0;
-  let dueToday = 0;
-  let dueSoon = 0;
-
-  for (let i = 0; i < tasks.length; i++) {
-    if (tasks[i].done !== true) {
-      let diff = (new Date(tasks[i].date) - new Date(today)) / (1000 * 60 * 60 * 24);
-
-      if (diff < 0) {
-        overdue++;
-      } else if (diff === 0) {
-        dueToday++;
-      } else if (diff <= 3) {
-        dueSoon++;
-      }
-    }
-  }
-
-  if (overdue + dueToday + dueSoon === 0) {
-    return;
-  }
-
-  let message = overdue + " overdue, " + dueToday + " due today, " + dueSoon + " due soon";
-
-  navigator.serviceWorker.ready.then(function (reg) {
-    reg.showNotification("My Task Tracker", { body: message });
-  });
-}
-
-notifyBtn.onclick = function () {
-  Notification.requestPermission().then(function (result) {
-    if (result === "granted") {
-      alert("Notification enabled");
-      notifyUser();
-    } else {
-      alert("Notification not allowed");
-    }
-  });
-};*/
-
-function addGroup(heading, list) {
+function addGroup(heading, list, colorClass) {
   if (list.length === 0) {
     return;
   }
 
-  let h = document.createElement("p");
-  h.textContent = heading;
-  h.style.fontWeight = "bold";
-  reminderBox.appendChild(h);
+  let card = document.createElement("div");
+  card.className = "reminder-card " + colorClass;
+
+  let h = document.createElement("h3");
+  h.textContent = heading + " (" + list.length + ")";
+  card.appendChild(h);
 
   for (let i = 0; i < list.length; i++) {
     let line = document.createElement("p");
-    line.textContent = "- " + list[i];
-    reminderBox.appendChild(line);
+    line.textContent = list[i];
+    card.appendChild(line);
   }
+
+  reminderBox.appendChild(card);
 }
 
 function showReminder() {
@@ -228,10 +212,25 @@ function showReminder() {
     }
   }
 
-  addGroup("OVERDUE:", overdueList);
-  addGroup("DUE TODAY:", todayList);
-  addGroup("DUE SOON:", soonList);
+  addGroup("OVERDUE", overdueList, "overdue");
+  addGroup("DUE TODAY", todayList, "today");
+  addGroup("DUE SOON", soonList, "soon");
 }
+
+openFormBtn.onclick = function () {
+  clearForm();
+  openForm();
+};
+
+cancelBtn.onclick = function () {
+  closeForm();
+};
+
+modal.onclick = function (event) {
+  if (event.target === modal) {
+    closeForm();
+  }
+};
 
 addBtn.onclick = function () {
   let subject = taskSubject.value;
@@ -267,8 +266,7 @@ addBtn.onclick = function () {
 
   saveTasks();
   showTasks();
-  clearForm();
+  closeForm();
 };
 
 showTasks();
-//notifyUser();
